@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up | JSEK Marketplace</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;600&display=swap" rel="stylesheet">
+</head>
+
+<body class="auth-page">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <header class="navbar">
+        <div class="logo">JSEK <span class="logo-accent">Marketplace</span></div>
+        <div class="nav-links">
+            <a href="index.html" class="text-link">Home Page</a>
+            <a href="support.html" class="text-link">Technical Support</a>
+        </div>
+    </header>
+
+    <main class="auth-container">
+        <div class="auth-card">
+            <h2>Create Account</h2>
+            <p>Join the marketplace to buy and sell electronics.</p>
+
+            <form id="signup-form" class="auth-form" novalidate>
+                <div class="input-group">
+                    <input type="text" name="fullName" placeholder="Full Name" autocomplete="name" required>
+                </div>
+                <div class="input-group">
+                    <input type="email" name="email" placeholder="Email Address" autocomplete="email" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" name="password" placeholder="Create Password (min. 8 chars)" minlength="8"
+                        autocomplete="new-password" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" name="confirmPassword" placeholder="Confirm Password" minlength="8"
+                        autocomplete="new-password" required>
+                </div>
+                <div class="input-group">
+                    <select name="role" required aria-label="Account type">
+                        <option value="" disabled selected>Select account type</option>
+                        <option value="buyer">Buyer</option>
+                        <option value="seller">Seller</option>
+                        <option value="vendor">Vendor</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <p id="signup-error" class="form-error" role="alert" aria-live="polite"></p>
+                <button type="submit" class="btn-glow">Register Now</button>
+            </form>
+            <div class="auth-footer">
+                <p>Already have an account? <a href="login.html" class="text-link">Login here</a></p>
+            </div>
+        </div>
+    </main>
+    <a href="support.html" class="quick-help-trigger">? Quick Help</a>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="logo">JSEK <span class="logo-accent">Marketplace</span></div>
+                <p>&copy; 2026 JSEK Electronics. All rights reserved.</p>
+            </div>
+
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">Home Page</a></li>
+                    <li><a href="support.html">Technical Support</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Our Team</h4>
+                <ul class="collaborators">
+                    <li>Emad Al Nounou</li>
+                    <li>Julia Cameron</li>
+                    <li>Khaled Al Akili</li>
+                    <li>Shefaa Alaghawani</li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+    <script>
+        const signupForm = document.getElementById('signup-form');
+        const signupError = document.getElementById('signup-error');
+
+        signupForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            signupError.textContent = '';
+            if (!signupForm.checkValidity()) {
+                signupForm.reportValidity();
+                return;
+            }
+
+            const formData = new FormData(signupForm);
+            const email = formData.get('email').trim().toLowerCase();
+            const password = formData.get('password');
+            const users = JSON.parse(localStorage.getItem('jsek_users')) || [];
+
+            if (password !== formData.get('confirmPassword')) {
+                signupError.textContent = 'Passwords do not match.';
+                return;
+            }
+            if (users.some((user) => user.email.toLowerCase() === email)) {
+                signupError.textContent = 'An account with this email already exists.';
+                return;
+            }
+
+            users.push({
+                fullName: formData.get('fullName').trim(),
+                email,
+                password,
+                role: formData.get('role')
+            });
+            localStorage.setItem('jsek_users', JSON.stringify(users));
+            window.location.assign('login.html');
+        });
+    </script>
+
+</html>

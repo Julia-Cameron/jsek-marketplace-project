@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Checkout | JSEK Marketplace</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <header class="navbar">
+        <div class="logo">
+            JSEK <span class="logo-accent">Marketplace</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="text-link">Home Page</a>
+            <a href="support.html" class="text-link">Technical Support</a>
+            <a href="login.html" class="btn-signup"
+                style="text-decoration: none; display: inline-block; text-align: center; margin-left: 20px;">Log Out</a>
+        </div>
+    </header>
+
+    <main class="auth-container checkout-page">
+        <div class="auth-card checkout-card">
+
+            <div id="checkout-content">
+                <h2>Secure Checkout</h2>
+                <p id="checkout-description">Select your payment method and enter details.</p>
+
+                <div class="checkout-summary" aria-label="Order summary">
+                    <div><span>JSEK Electronics subtotal</span><strong id="order-total">$100.00</strong></div>
+                    <small id="order-status">Tax is calculated on your receipt.</small>
+                </div>
+
+                <form id="payment-form" class="auth-form" novalidate>
+                    <fieldset class="payment-methods">
+                        <legend>Payment method</legend>
+                        <label class="payment-option">
+                            <input type="radio" name="payment" value="card" checked>
+                            <span>Credit Card</span>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="payment" value="paypal">
+                            <span>PayPal</span>
+                        </label>
+                    </fieldset>
+
+                    <div id="card-fields">
+                        <div class="input-group">
+                            <label for="cardholder-name">Cardholder name</label>
+                            <input id="cardholder-name" name="cardholderName" type="text" autocomplete="cc-name"
+                                placeholder="Cardholder Name" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="card-number">Card number</label>
+                            <input id="card-number" name="cardNumber" type="text" inputmode="numeric"
+                                autocomplete="cc-number" placeholder="1234 5678 9012 3456" minlength="19" maxlength="19"
+                                required>
+                        </div>
+                        <div class="checkout-fields-row">
+                            <div class="input-group">
+                                <label for="expiry">Expiry</label>
+                                <input id="expiry" name="expiry" type="text" inputmode="numeric" autocomplete="cc-exp"
+                                    placeholder="MM/YY" maxlength="5" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="cvv">CVV</label>
+                                <input id="cvv" name="cvv" type="text" inputmode="numeric" autocomplete="cc-csc"
+                                    placeholder="CVV" maxlength="4" minlength="3" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="paypal-fields" class="paypal-fields" hidden>
+                        <p>You will be redirected to PayPal to complete your payment securely.</p>
+                    </div>
+
+                    <p id="form-error" class="form-error" role="alert" aria-live="polite"></p>
+                    <button type="submit" class="btn-glow" id="pay-button">Pay Now</button>
+                </form>
+            </div>
+
+            <div id="payment-success" style="display: none; text-align: center; padding: 20px 0;">
+                <div class="success-icon" style="margin: 0 auto 20px;">✓</div>
+                <h2>Payment Received!</h2>
+                <p>Thank you, your payment was received successfully.</p>
+                <a href="receipt.html" class="btn-glow receipt-link">View Receipt</a>
+                <a href="index.html" class="btn-glow"
+                    style="display: inline-block; text-decoration: none; margin-top: 12px; width: auto; padding: 12px 30px;">Return
+                    Home</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-content" style="max-width: 1100px; margin: 0 auto; padding: 20px;">
+            <div class="footer-section">
+                <div class="logo">JSEK <span class="logo-accent">Marketplace</span></div>
+                <p>&copy; 2026 JSEK Electronics. All rights reserved.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">Home Page</a></li>
+                    <li><a href="support.html">Technical Support</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Our Team</h4>
+                <ul class="collaborators">
+                    <li>Emad Al Nounou</li>
+                    <li>Julia Cameron</li>
+                    <li>Khaled Al Akili</li>
+                    <li>Shefaa Alaghawani</li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('mousemove', (e) => {
+            const x = (window.innerWidth / 2 - e.pageX) / 10;
+            const y = (window.innerHeight / 2 - e.pageY) / 10;
+            document.documentElement.style.setProperty('--mouse-x', x + 'px');
+            document.documentElement.style.setProperty('--mouse-y', y + 'px');
+        });
+
+        const form = document.getElementById('payment-form');
+        const cardFields = document.getElementById('card-fields');
+        const paypalFields = document.getElementById('paypal-fields');
+        const payButton = document.getElementById('pay-button');
+        const formError = document.getElementById('form-error');
+        const cardNumber = document.getElementById('card-number');
+        const expiry = document.getElementById('expiry');
+        const cvv = document.getElementById('cvv');
+
+        function selectedPaymentMethod() {
+            return form.elements.payment.value;
+        }
+
+        function updatePaymentMethod() {
+            const isCard = selectedPaymentMethod() === 'card';
+            cardFields.hidden = !isCard;
+            paypalFields.hidden = isCard;
+            payButton.textContent = isCard ? 'Pay Now' : 'Continue to PayPal';
+            cardFields.querySelectorAll('input').forEach((input) => {
+                input.required = isCard;
+            });
+            formError.textContent = '';
+        }
+
+        form.querySelectorAll('input[name="payment"]').forEach((input) => {
+            input.addEventListener('change', updatePaymentMethod);
+        });
+
+        cardNumber.addEventListener('input', () => {
+            cardNumber.value = cardNumber.value.replace(/\D/g, '').slice(0, 16).replace(/(.{4})/g, '$1 ').trim();
+        });
+        expiry.addEventListener('input', () => {
+            const digits = expiry.value.replace(/\D/g, '').slice(0, 4);
+            expiry.value = digits.length > 2 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits;
+        });
+        cvv.addEventListener('input', () => {
+            cvv.value = cvv.value.replace(/\D/g, '').slice(0, 4);
+        });
+
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            formError.textContent = '';
+
+            if (selectedPaymentMethod() === 'card') {
+                const expiryParts = expiry.value.split('/');
+                const month = Number(expiryParts[0]);
+                const year = Number(expiryParts[1]);
+                const now = new Date();
+                const isExpired = expiryParts.length !== 2 || month < 1 || month > 12 ||
+                    year < now.getFullYear() % 100 ||
+                    (year === now.getFullYear() % 100 && month <= now.getMonth());
+
+                if (!form.checkValidity()) {
+                    formError.textContent = 'Please complete all card details.';
+                    form.reportValidity();
+                    return;
+                }
+                if (isExpired) {
+                    formError.textContent = 'Enter a valid, future expiry date.';
+                    expiry.focus();
+                    return;
+                }
+            }
+
+            const subtotal = 100;
+            const taxRate = 0.13;
+            const tax = Number((subtotal * taxRate).toFixed(2));
+            const total = Number((subtotal + tax).toFixed(2));
+            localStorage.setItem('jsekReceipt', JSON.stringify({
+                orderNumber: `JSEK-${Date.now().toString().slice(-8)}`,
+                date: new Date().toISOString(),
+                paymentMethod: selectedPaymentMethod(),
+                subtotal,
+                taxRate,
+                tax,
+                total,
+                email: JSON.parse(localStorage.getItem('currentUser') || 'null')?.email || ''
+            }));
+
+            document.getElementById('checkout-content').hidden = true;
+            document.getElementById('payment-success').style.display = 'block';
+        });
+    </script>
+</body>
+
+</html>

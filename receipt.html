@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt | JSEK Marketplace</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <header class="navbar">
+        <div class="logo">JSEK <span class="logo-accent">Marketplace</span></div>
+        <div class="nav-links">
+            <a href="index.html" class="text-link">Home Page</a>
+            <a href="support.html" class="text-link">Technical Support</a>
+        </div>
+    </header>
+
+    <main class="receipt-page">
+        <section class="receipt-card" aria-labelledby="receipt-title">
+            <div class="receipt-heading">
+                <div class="success-icon">✓</div>
+                <p class="receipt-kicker">JSEK Marketplace</p>
+                <h1 id="receipt-title">Payment Receipt</h1>
+                <p id="receipt-meta">Your transaction is complete.</p>
+            </div>
+
+            <div class="receipt-lines">
+                <div><span>Order number</span><strong id="receipt-number"></strong></div>
+                <div><span>Payment method</span><strong id="receipt-payment"></strong></div>
+                <div><span>Subtotal</span><strong id="receipt-subtotal"></strong></div>
+                <div><span>HST (13%)</span><strong id="receipt-tax"></strong></div>
+                <div class="receipt-total"><span>Total paid</span><strong id="receipt-total"></strong></div>
+            </div>
+
+            <div class="receipt-actions">
+                <fieldset>
+                    <legend>Receipt delivery</legend>
+                    <label><input type="radio" name="delivery" value="print"> Print receipt</label>
+                    <label><input type="radio" name="delivery" value="email"> Email receipt</label>
+                    <label><input type="radio" name="delivery" value="both" checked> Print and email</label>
+                </fieldset>
+                <div id="receipt-email-field" class="receipt-email-field">
+                    <label for="receipt-email">Email address</label>
+                    <input id="receipt-email" type="email" placeholder="you@example.com" autocomplete="email">
+                </div>
+                <p id="receipt-error" class="form-error" role="alert" aria-live="polite"></p>
+                <button type="button" id="receipt-action" class="btn-glow">Print and Email Receipt</button>
+                <a href="index.html" class="receipt-home">Return Home</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="logo">JSEK <span class="logo-accent">Marketplace</span></div>
+                <p>&copy; 2026 JSEK Electronics. All rights reserved.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">Home Page</a></li>
+                    <li><a href="support.html">Technical Support</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('mousemove', (event) => {
+            const x = (window.innerWidth / 2 - event.pageX) / 10;
+            const y = (window.innerHeight / 2 - event.pageY) / 10;
+            document.documentElement.style.setProperty('--mouse-x', `${x}px`);
+            document.documentElement.style.setProperty('--mouse-y', `${y}px`);
+        });
+
+        const receipt = JSON.parse(localStorage.getItem('jsekReceipt')) || {
+            orderNumber: 'JSEK-DEMO',
+            date: new Date().toISOString(),
+            paymentMethod: 'card',
+            subtotal: 100,
+            tax: 13,
+            total: 113,
+            email: ''
+        };
+        const currency = (value) => `$${Number(value).toFixed(2)}`;
+        const paymentName = receipt.paymentMethod === 'paypal' ? 'PayPal' : 'Credit card';
+        const date = new Date(receipt.date);
+        const emailInput = document.getElementById('receipt-email');
+        const deliveryOptions = document.querySelectorAll('input[name="delivery"]');
+        const actionButton = document.getElementById('receipt-action');
+        const errorMessage = document.getElementById('receipt-error');
+
+        document.getElementById('receipt-meta').textContent = `Paid on ${date.toLocaleDateString()} at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        document.getElementById('receipt-number').textContent = receipt.orderNumber;
+        document.getElementById('receipt-payment').textContent = paymentName;
+        document.getElementById('receipt-subtotal').textContent = currency(receipt.subtotal);
+        document.getElementById('receipt-tax').textContent = currency(receipt.tax);
+        document.getElementById('receipt-total').textContent = currency(receipt.total);
+        emailInput.value = receipt.email || '';
+
+        function selectedDelivery() {
+            return document.querySelector('input[name="delivery"]:checked').value;
+        }
+
+        function updateReceiptAction() {
+            const delivery = selectedDelivery();
+            document.getElementById('receipt-email-field').hidden = delivery === 'print';
+            actionButton.textContent = delivery === 'print' ? 'Print Receipt' :
+                delivery === 'email' ? 'Email Receipt' : 'Print and Email Receipt';
+            errorMessage.textContent = '';
+        }
+
+        deliveryOptions.forEach((option) => option.addEventListener('change', updateReceiptAction));
+        updateReceiptAction();
+
+        actionButton.addEventListener('click', () => {
+            const delivery = selectedDelivery();
+            const email = emailInput.value.trim();
+            errorMessage.textContent = '';
+
+            if ((delivery === 'email' || delivery === 'both') && !emailInput.checkValidity()) {
+                errorMessage.textContent = 'Enter a valid email address to receive the receipt.';
+                emailInput.focus();
+                return;
+            }
+
+            if (delivery === 'email' || delivery === 'both') {
+                window.location.href = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(`JSEK Receipt ${receipt.orderNumber}`)}&body=${encodeURIComponent(`Your JSEK Marketplace receipt total is ${currency(receipt.total)}.`)}`;
+            }
+            if (delivery === 'print' || delivery === 'both') {
+                window.print();
+            }
+            actionButton.textContent = 'Receipt Ready';
+        });
+    </script>
+</body>
+
+</html>

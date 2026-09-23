@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | JSEK Marketplace</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fcfcfc;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+
+        /* Filter Controls matching Inventory page */
+        .filter-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 8px;
+            background: #eee;
+            padding: 6px;
+            border-radius: 50px;
+        }
+
+        .filter-btn {
+            border: none;
+            padding: 10px 24px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            background: transparent;
+            color: #555;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #000;
+        }
+
+        .filter-btn.selected {
+            background-color: #000;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Layout elements */
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card,
+        .flag-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            text-align: left;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 600;
+            color: #000;
+            margin: 10px 0;
+        }
+
+        .flag-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #fff5f5;
+            border-left: 4px solid #fa5252;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #fa5252;
+        }
+
+        .status-pill {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-online {
+            background: #e6fcf5;
+            color: #0ca678;
+        }
+
+        .btn-inspect {
+            padding: 6px 15px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-inspect:hover {
+            background: #f8f9fa;
+            border-color: #bbb;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <header class="navbar">
+        <div class="logo">JSEK <span class="logo-accent">Marketplace</span></div>
+        <div class="nav-links">
+            <a href="index.html" class="text-link" style="margin-left: 20px;">Home Page</a>
+            <a href="support.html" class="text-link" style="margin-left: 20px;">Technical Support</a>
+            <span id="adminGreeting" style="margin-left: 20px; font-weight: 600; font-size: 14px; color: #666;"></span>
+            <a href="#" onclick="logout()" class="btn-signup" style="margin-left: 20px; cursor: pointer;">Log Out</a>
+        </div>
+    </header>
+
+    <main
+        style="max-width: 1100px; margin: 0 auto; padding: 40px 20px; text-align: center; flex: 1; width: 100%; box-sizing: border-box;">
+
+        <section class="inventory-header">
+            <h1 style="font-size: 36px; margin-bottom: 10px; color: #000;">Admin Dashboard</h1>
+            <p style="font-size: 18px; color: #666; margin-bottom: 30px;">System Oversight & User Account Management</p>
+        </section>
+
+        <div class="admin-grid">
+            <div class="stat-card">
+                <h3 style="font-size: 16px; color: #888; margin: 0;">Total Accounts</h3>
+                <div class="stat-number" id="userCount">0</div>
+                <p style="font-size: 13px; color: #aaa;">Registered across the platform</p>
+            </div>
+
+            <div class="flag-card">
+                <h3 style="font-size: 16px; color: #888; margin-bottom: 15px;">Security Red Flags</h3>
+                <div id="flagList">
+                    <div class="flag-item">
+                        <span style="font-weight: 600;">CRITICAL:</span> <span>Server Latency in Shopping Cart
+                            API</span>
+                    </div>
+                    <div class="flag-item" style="background: #fff9db; border-color: #f08c00; color: #f08c00;">
+                        <span style="font-weight: 600;">NEW:</span> <span>Pending approval for Seller ID
+                            verification</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-controls">
+            <div class="filter-group">
+                <button class="filter-btn selected" id="btn-all" onclick="filterUsers('all')">All Accounts</button>
+                <button class="filter-btn" id="btn-admin" onclick="filterUsers('admin')">Admins</button>
+                <button class="filter-btn" id="btn-buyer" onclick="filterUsers('buyer')">Buyers</button>
+                <button class="filter-btn" id="btn-seller" onclick="filterUsers('seller')">Sellers</button>
+                <button class="filter-btn" id="btn-vendor" onclick="filterUsers('vendor')">Vendors</button>
+            </div>
+        </div>
+
+        <table
+            style="margin: 0 auto; width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+            <thead>
+                <tr style="background-color: #f8f9fa; border-bottom: 2px solid #eee;">
+                    <th style="padding: 15px; text-align: center;">Full Name</th>
+                    <th style="padding: 15px; text-align: center;">Email</th>
+                    <th style="padding: 15px; text-align: center;">Role</th>
+                    <th style="padding: 15px; text-align: center;">Status</th>
+                    <th style="padding: 15px; text-align: center;">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody" style="color: #444;">
+            </tbody>
+        </table>
+    </main>
+
+    <footer class="main-footer" style="width: 100%; margin-top: auto;">
+        <div class="footer-content" style="max-width: 1100px; margin: 0 auto; padding: 20px;">
+            <div class="footer-section">
+                <div class="logo">JSEK <span class="logo-accent">Marketplace</span></div>
+                <p>&copy; 2026 JSEK Electronics. All rights reserved.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">Home Page</a></li>
+                    <li><a href="support.html">Technical Support</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Our Team</h4>
+                <ul class="collaborators">
+                    <li>Emad Al Nounou</li>
+                    <li>Julia Cameron</li>
+                    <li>Khaled Al Akili</li>
+                    <li>Shefaa Alaghawani</li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Magnetic background logic
+        document.addEventListener('mousemove', (e) => {
+            const x = (window.innerWidth / 2 - e.pageX) / 10;
+            const y = (window.innerHeight / 2 - e.pageY) / 10;
+            document.documentElement.style.setProperty('--mouse-x', x + 'px');
+            document.documentElement.style.setProperty('--mouse-y', y + 'px');
+        });
+
+        // Authentication & Data Loading
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        const isLoggedIn = localStorage.getItem('isLoggedIn');
+
+        if (isLoggedIn !== 'true' || !currentUser || currentUser.role.toLowerCase() !== 'admin') {
+            window.location.assign("login.html");
+        } else {
+            document.getElementById('adminGreeting').textContent = `Admin: ${currentUser.fullName}`;
+            loadUsers();
+        }
+
+        function loadUsers() {
+            const users = JSON.parse(localStorage.getItem('jsek_users')) || [];
+            document.getElementById('userCount').textContent = users.length;
+            const tableBody = document.getElementById('userTableBody');
+            tableBody.innerHTML = "";
+
+            const escapeHtml = (value) => String(value || '').replace(/[&<>'"]/g, (character) => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            }[character]));
+
+            users.forEach(user => {
+                const fullName = escapeHtml(user.fullName || 'User');
+                const email = escapeHtml(user.email);
+                const role = escapeHtml(user.role);
+                tableBody.innerHTML += `
+                    <tr style="border-bottom: 1px solid #eee;" data-role="${role.toLowerCase()}">
+                        <td style="padding: 15px; text-align: center;"><strong>${fullName}</strong></td>
+                        <td style="padding: 15px; text-align: center;">${email}</td>
+                        <td style="padding: 15px; text-align: center;">
+                            <span style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: #666;">${role}</span>
+                        </td>
+                        <td style="padding: 15px; text-align: center;">
+                            <span class="status-pill status-online">Online</span>
+                        </td>
+                        <td style="padding: 15px; text-align: center;">
+                            <button class="btn-inspect" type="button" onclick="alert('Viewing user account')">Inspect</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        // Filter Functionality
+        function filterUsers(role) {
+            const rows = document.querySelectorAll("#userTableBody tr");
+            const buttons = document.querySelectorAll(".filter-btn");
+
+            buttons.forEach(btn => {
+                btn.classList.remove('selected');
+                if (btn.id === `btn-${role}`) btn.classList.add('selected');
+            });
+
+            rows.forEach(row => {
+                const userRole = row.getAttribute('data-role');
+                if (role === 'all' || userRole === role) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+
+        function logout() {
+            localStorage.setItem('isLoggedIn', 'false');
+            localStorage.removeItem('currentUser');
+            window.location.assign("login.html");
+        }
+    </script>
+</body>
+
+</html>

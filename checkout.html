@@ -58,9 +58,25 @@
                         </div>
                         <div class="input-group">
                             <label for="card-number">Card number</label>
-                            <input id="card-number" name="cardNumber" type="text" inputmode="numeric"
-                                autocomplete="cc-number" placeholder="1234 5678 9012 3456" minlength="19" maxlength="19"
-                                required>
+                            <div class="card-logos" id="card-logos" aria-live="polite">
+                                <svg id="visa-logo" class="card-logo" viewBox="0 0 48 16"
+                                    xmlns="http://www.w3.org/2000/svg" aria-label="Visa">
+                                    <rect width="48" height="16" rx="2" fill="#fff" />
+                                    <text x="24" y="12" text-anchor="middle" font-family="Arial, sans-serif"
+                                        font-weight="700" font-style="italic" font-size="9" fill="#1a1f71">VISA</text>
+                                </svg>
+                                <svg id="mastercard-logo" class="card-logo" viewBox="0 0 48 16"
+                                    xmlns="http://www.w3.org/2000/svg" aria-label="Mastercard">
+                                    <rect width="48" height="16" rx="2" fill="#fff" />
+                                    <circle cx="21" cy="8" r="6" fill="#eb001b" />
+                                    <circle cx="29" cy="8" r="6" fill="#f79e1b" fill-opacity="0.9" />
+                                </svg>
+                            </div>
+                            <div class="card-number-wrap">
+                                <input id="card-number" name="cardNumber" type="text" inputmode="numeric"
+                                    autocomplete="cc-number" placeholder="1234 5678 9012 3456" minlength="19"
+                                    maxlength="19" required>
+                            </div>
                         </div>
                         <div class="checkout-fields-row">
                             <div class="input-group">
@@ -135,11 +151,41 @@
         const payButton = document.getElementById('pay-button');
         const formError = document.getElementById('form-error');
         const cardNumber = document.getElementById('card-number');
+        const visaLogo = document.getElementById('visa-logo');
+        const mastercardLogo = document.getElementById('mastercard-logo');
         const expiry = document.getElementById('expiry');
         const cvv = document.getElementById('cvv');
 
+        // Test-only decline scenarios (fake numbers, no real payment data)
+        const DECLINED_CARDS = {
+            '4000000000009995': 'Your card has insufficient funds. Please try a different card.',
+            '4000000000000002': 'Your card was declined by the issuing bank.'
+        };
+
         function selectedPaymentMethod() {
             return form.elements.payment.value;
+        }
+
+        function detectCardType(digits) {
+            if (/^4/.test(digits)) return 'Visa';
+            if (/^(5[1-5]|2(2[2-9]|[3-6]\d|7[01]|720))/.test(digits)) return 'Mastercard';
+            return '';
+        }
+
+        function luhnCheck(digits) {
+            if (!/^\d{13,19}$/.test(digits)) return false;
+            let sum = 0;
+            let shouldDouble = false;
+            for (let i = digits.length - 1; i >= 0; i--) {
+                let d = Number(digits[i]);
+                if (shouldDouble) {
+                    d *= 2;
+                    if (d > 9) d -= 9;
+                }
+                sum += d;
+                shouldDouble = !shouldDouble;
+            }
+            return sum % 10 === 0;
         }
 
         function updatePaymentMethod() {
@@ -158,7 +204,13 @@
         });
 
         cardNumber.addEventListener('input', () => {
-            cardNumber.value = cardNumber.value.replace(/\D/g, '').slice(0, 16).replace(/(.{4})/g, '$1 ').trim();
+            const digits = cardNumber.value.replace(/\D/g, '').slice(0, 16);
+            cardNumber.value = digits.replace(/(.{4})/g, '$1 ').trim();
+            const cardType = detectCardType(digits);
+            visaLogo.classList.toggle('active', cardType === 'Visa');
+            mastercardLogo.classList.toggle('active', cardType === 'Mastercard');
+            visaLogo.classList.toggle('dimmed', !!cardType && cardType !== 'Visa');
+            mastercardLogo.classList.toggle('dimmed', !!cardType && cardType !== 'Mastercard');
         });
         expiry.addEventListener('input', () => {
             const digits = expiry.value.replace(/\D/g, '').slice(0, 4);
@@ -184,6 +236,18 @@
                 if (!form.checkValidity()) {
                     formError.textContent = 'Please complete all card details.';
                     form.reportValidity();
+                    return;
+                }
+
+                const digits = cardNumber.value.replace(/\D/g, '');
+                if (!luhnCheck(digits)) {
+                    formError.textContent = 'Invalid card number. Please check the digits and try again.';
+                    cardNumber.focus();
+                    return;
+                }
+                if (DECLINED_CARDS[digits]) {
+                    formError.textContent = DECLINED_CARDS[digits];
+                    cardNumber.focus();
                     return;
                 }
                 if (isExpired) {

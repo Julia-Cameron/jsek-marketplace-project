@@ -13,6 +13,8 @@ I designed and implemented the main customer-facing flow and its validation logi
 - Created the login page in `login.html`
 - Created the secure checkout page in `checkout.html`
 - Added checkout validation for cardholder name, card number, expiry date, CVV, and payment method selection
+- Added automatic card-network detection (Visa/Mastercard) as the card number is typed
+- Added card number validation (Luhn checksum) and simulated decline scenarios (invalid card, insufficient funds)
 - Added PayPal and credit-card checkout states
 - Added receipt generation with subtotal, 13% HST, total payment, and print/email options
 - Added responsive layout and padding adjustments for desktop and mobile screens
@@ -24,12 +26,27 @@ The remaining vendor, admin, and support pages were integrated into the same nav
 - Portal selection from the home page
 - Local demo account registration with role selection
 - Login with remember-me support and role-based dashboard routing
-- Checkout with credit-card validation and PayPal flow selection
+- Checkout with credit-card validation, live Visa/Mastercard detection, and PayPal flow selection
 - Receipt generation with tax calculation and print/email delivery options
 - Vendor inventory view with stock status
 - Admin dashboard with account filters and session protection
 - Technical support ticket confirmation and password-reset request confirmation
 - Responsive layout for desktop and mobile screens
+
+## Checkout Card Testing
+
+The checkout form (`checkout.html`) validates card numbers with a Luhn checksum, detects the card network (Visa/Mastercard) live as digits are typed, and simulates bank decline responses for specific test numbers. All numbers below are fake/publicly-used test values — no real payment data is involved.
+
+| Card number | Expected result |
+| --- | --- |
+| `4242 4242 4242 4242` | Valid Visa — passes validation and completes payment |
+| `5555 5555 5555 4444` | Valid Mastercard — passes validation and completes payment |
+| `4242 4242 4242 4241` | Invalid card number — fails the Luhn checksum, shows "Invalid card number" error |
+| `4000 0000 0000 9995` | Valid Visa, simulated decline — shows "insufficient funds" error |
+| `4000 0000 0000 0002` | Valid Visa, simulated decline — shows "declined by the issuing bank" error |
+
+To test: open `checkout.html`, select Credit Card, enter any name/future expiry/3-digit CVV, then type one of the numbers above into the card number field. The Visa/Mastercard label appears automatically to the right of the field as you type, and submitting the form shows the corresponding success or error message.
+
 
 ## Run Locally
 

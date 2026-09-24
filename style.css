@@ -533,6 +533,37 @@ body {
     flex: 1;
 }
 
+.card-number-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.card-logos {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.card-logo {
+    width: 56px;
+    height: auto;
+    border-radius: 4px;
+    opacity: 0.35;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.card-logo.active {
+    opacity: 1;
+    transform: translateY(-1px);
+}
+
+.card-logo.dimmed {
+    opacity: 0.15;
+}
+
 .paypal-fields {
     padding: 14px 4px;
     color: #5a6d78;

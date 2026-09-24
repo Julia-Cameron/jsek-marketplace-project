@@ -121,7 +121,7 @@
 
             const destination = user.role === 'admin' ? 'admin_dashboard.html' :
                 user.role === 'vendor' ? 'vendor_inventory.html' :
-                user.role === 'buyer' ? 'buyer_dashboard.html' : 'index.html';
+                    user.role === 'buyer' ? 'buyer_dashboard.html' : 'index.html';
             window.location.assign(destination);
         });
 

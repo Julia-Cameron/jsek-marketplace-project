@@ -425,6 +425,22 @@ body {
     color: #7f8c8d;
 }
 
+.receipt-items {
+    list-style: none;
+    margin: 0 0 16px;
+    padding: 0 0 12px;
+    border-bottom: 1px solid rgba(44, 62, 80, 0.12);
+}
+
+.receipt-items li {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 6px 0;
+    color: #667784;
+    font-size: 0.92rem;
+}
+
 .receipt-lines {
     border-top: 1px solid rgba(44, 62, 80, 0.12);
 }

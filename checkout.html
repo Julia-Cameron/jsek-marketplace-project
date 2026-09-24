@@ -18,6 +18,7 @@
             JSEK <span class="logo-accent">Marketplace</span>
         </div>
         <div class="nav-links">
+            <a href="buyer_dashboard.html" class="text-link">Back to Dashboard</a>
             <a href="index.html" class="text-link">Home Page</a>
             <a href="support.html" class="text-link">Technical Support</a>
             <a href="login.html" class="btn-signup"
@@ -98,6 +99,9 @@
 
                     <p id="form-error" class="form-error" role="alert" aria-live="polite"></p>
                     <button type="submit" class="btn-glow" id="pay-button">Pay Now</button>
+                    <a href="buyer_dashboard.html" class="btn-glow"
+                        style="display: inline-block; text-decoration: none; margin-top: 10px; background: transparent; border: 1px solid #5a7d9a; color: #5a7d9a; box-shadow: none;">Return
+                        to Dashboard</a>
                 </form>
             </div>
 
@@ -106,6 +110,9 @@
                 <h2>Payment Received!</h2>
                 <p>Thank you, your payment was received successfully.</p>
                 <a href="receipt.html" class="btn-glow receipt-link">View Receipt</a>
+                <a href="buyer_dashboard.html" class="btn-glow"
+                    style="display: inline-block; text-decoration: none; margin-top: 12px; width: auto; padding: 12px 30px;">Return
+                    to Dashboard</a>
                 <a href="index.html" class="btn-glow"
                     style="display: inline-block; text-decoration: none; margin-top: 12px; width: auto; padding: 12px 30px;">Return
                     Home</a>
@@ -282,6 +289,7 @@
                 orderNumber: `JSEK-${Date.now().toString().slice(-8)}`,
                 date: new Date().toISOString(),
                 paymentMethod: selectedPaymentMethod(),
+                items: cart,
                 subtotal,
                 taxRate,
                 tax,

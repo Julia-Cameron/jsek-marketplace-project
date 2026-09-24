@@ -30,6 +30,8 @@
                 <p id="receipt-meta">Your transaction is complete.</p>
             </div>
 
+            <ul id="receipt-items" class="receipt-items"></ul>
+
             <div class="receipt-lines">
                 <div><span>Order number</span><strong id="receipt-number"></strong></div>
                 <div><span>Payment method</span><strong id="receipt-payment"></strong></div>
@@ -84,6 +86,7 @@
             orderNumber: 'JSEK-DEMO',
             date: new Date().toISOString(),
             paymentMethod: 'card',
+            items: [],
             subtotal: 100,
             tax: 13,
             total: 113,
@@ -96,6 +99,7 @@
         const deliveryOptions = document.querySelectorAll('input[name="delivery"]');
         const actionButton = document.getElementById('receipt-action');
         const errorMessage = document.getElementById('receipt-error');
+        const itemsList = document.getElementById('receipt-items');
 
         document.getElementById('receipt-meta').textContent = `Paid on ${date.toLocaleDateString()} at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
         document.getElementById('receipt-number').textContent = receipt.orderNumber;
@@ -104,6 +108,12 @@
         document.getElementById('receipt-tax').textContent = currency(receipt.tax);
         document.getElementById('receipt-total').textContent = currency(receipt.total);
         emailInput.value = receipt.email || '';
+
+        const items = receipt.items || [];
+        itemsList.hidden = items.length === 0;
+        itemsList.innerHTML = items.map((item) =>
+            `<li><span>${item.name} &times; ${item.qty}</span><span>${currency(item.price * item.qty)}</span></li>`
+        ).join('');
 
         function selectedDelivery() {
             return document.querySelector('input[name="delivery"]:checked').value;

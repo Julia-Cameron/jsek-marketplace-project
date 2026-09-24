@@ -539,6 +539,11 @@ body {
     align-items: center;
 }
 
+.input-error {
+    border-color: #c0392b !important;
+    box-shadow: 0 0 0 1px #c0392b;
+}
+
 .card-logos {
     display: flex;
     justify-content: flex-end;
@@ -576,10 +581,18 @@ body {
 
 .form-error {
     min-height: 1.2em;
-    margin: -8px 0 0;
+    margin: -4px 0 4px;
     color: #c0392b;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
+    font-weight: 600;
     text-align: left;
+}
+
+.form-error:not(:empty) {
+    padding: 10px 12px;
+    background: rgba(192, 57, 43, 0.1);
+    border: 1px solid rgba(192, 57, 43, 0.4);
+    border-radius: 8px;
 }
 
 [hidden] {

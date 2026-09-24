@@ -211,6 +211,7 @@
             mastercardLogo.classList.toggle('active', cardType === 'Mastercard');
             visaLogo.classList.toggle('dimmed', !!cardType && cardType !== 'Visa');
             mastercardLogo.classList.toggle('dimmed', !!cardType && cardType !== 'Mastercard');
+            cardNumber.classList.remove('input-error');
         });
         expiry.addEventListener('input', () => {
             const digits = expiry.value.replace(/\D/g, '').slice(0, 4);
@@ -223,6 +224,7 @@
         form.addEventListener('submit', (event) => {
             event.preventDefault();
             formError.textContent = '';
+            cardNumber.classList.remove('input-error');
 
             if (selectedPaymentMethod() === 'card') {
                 const expiryParts = expiry.value.split('/');
@@ -242,11 +244,13 @@
                 const digits = cardNumber.value.replace(/\D/g, '');
                 if (!luhnCheck(digits)) {
                     formError.textContent = 'Invalid card number. Please check the digits and try again.';
+                    cardNumber.classList.add('input-error');
                     cardNumber.focus();
                     return;
                 }
                 if (DECLINED_CARDS[digits]) {
                     formError.textContent = DECLINED_CARDS[digits];
+                    cardNumber.classList.add('input-error');
                     cardNumber.focus();
                     return;
                 }

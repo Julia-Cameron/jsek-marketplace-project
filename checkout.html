@@ -33,6 +33,7 @@
                 <p id="checkout-description">Select your payment method and enter details.</p>
 
                 <div class="checkout-summary" aria-label="Order summary">
+                    <ul id="order-items" class="order-items"></ul>
                     <div><span>JSEK Electronics subtotal</span><strong id="order-total">$100.00</strong></div>
                     <small id="order-status">Tax is calculated on your receipt.</small>
                 </div>
@@ -156,6 +157,18 @@
         const expiry = document.getElementById('expiry');
         const cvv = document.getElementById('cvv');
 
+        // Cart is populated from buyer_dashboard.html; falls back to a flat demo subtotal if empty
+        const cart = JSON.parse(localStorage.getItem('jsekCart')) || [];
+        const cartSubtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+        const subtotalAmount = cart.length > 0 ? cartSubtotal : 100;
+
+        const orderItemsList = document.getElementById('order-items');
+        const orderTotalEl = document.getElementById('order-total');
+        orderItemsList.innerHTML = cart.map((item) =>
+            `<li><span>${item.name} &times; ${item.qty}</span><span>$${(item.price * item.qty).toFixed(2)}</span></li>`
+        ).join('');
+        orderTotalEl.textContent = `$${subtotalAmount.toFixed(2)}`;
+
         // Test-only decline scenarios (fake numbers, no real payment data)
         const DECLINED_CARDS = {
             '4000000000009995': 'Your card has insufficient funds. Please try a different card.',
@@ -261,7 +274,7 @@
                 }
             }
 
-            const subtotal = 100;
+            const subtotal = subtotalAmount;
             const taxRate = 0.13;
             const tax = Number((subtotal * taxRate).toFixed(2));
             const total = Number((subtotal + tax).toFixed(2));
@@ -275,6 +288,7 @@
                 total,
                 email: JSON.parse(localStorage.getItem('currentUser') || 'null')?.email || ''
             }));
+            localStorage.removeItem('jsekCart');
 
             document.getElementById('checkout-content').hidden = true;
             document.getElementById('payment-success').style.display = 'block';

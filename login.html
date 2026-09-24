@@ -82,6 +82,16 @@
         const loginError = document.getElementById('login-error');
         const requestedRole = new URLSearchParams(window.location.search).get('role');
 
+        // Seed a ready-to-use demo buyer account for testing the checkout flow
+        (function seedDemoBuyer() {
+            const users = JSON.parse(localStorage.getItem('jsek_users')) || [];
+            const demoEmail = 'buyer@jsek.com';
+            if (!users.some((user) => user.email.toLowerCase() === demoEmail)) {
+                users.push({ fullName: 'Demo Buyer', email: demoEmail, password: 'Buyer123!', role: 'buyer' });
+                localStorage.setItem('jsek_users', JSON.stringify(users));
+            }
+        })();
+
         loginForm.addEventListener('submit', (event) => {
             event.preventDefault();
             loginError.textContent = '';
@@ -110,7 +120,8 @@
             }
 
             const destination = user.role === 'admin' ? 'admin_dashboard.html' :
-                user.role === 'vendor' ? 'vendor_inventory.html' : 'index.html';
+                user.role === 'vendor' ? 'vendor_inventory.html' :
+                user.role === 'buyer' ? 'buyer_dashboard.html' : 'index.html';
             window.location.assign(destination);
         });
 

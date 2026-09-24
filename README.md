@@ -12,6 +12,7 @@ I designed and implemented the main customer-facing flow and its validation logi
 - Created the account registration page in `signup.html`
 - Created the login page in `login.html`
 - Created the secure checkout page in `checkout.html`
+- Created the buyer dashboard with saved items and a cart in `buyer_dashboard.html`, connected to checkout via `localStorage`
 - Added checkout validation for cardholder name, card number, expiry date, CVV, and payment method selection
 - Added automatic card-network detection (Visa/Mastercard) as the card number is typed
 - Added card number validation (Luhn checksum) and simulated decline scenarios (invalid card, insufficient funds)
@@ -47,6 +48,21 @@ The checkout form (`checkout.html`) validates card numbers with a Luhn checksum,
 
 To test: open `checkout.html`, select Credit Card, enter any name/future expiry/3-digit CVV, then type one of the numbers above into the card number field. The Visa/Mastercard label appears automatically to the right of the field as you type, and submitting the form shows the corresponding success or error message.
 
+## Buyer Dashboard and Cart Testing
+
+`buyer_dashboard.html` gives a logged-in buyer a list of saved items, an "Add to Cart" action per item, and a cart table with quantity controls. The cart is stored in `localStorage` under `jsekCart` and is picked up automatically by `checkout.html`, which lists the cart items and totals the subtotal instead of using a flat demo amount. Completing payment clears the cart.
+
+**Demo buyer login:**
+
+| Field | Value |
+| --- | --- |
+| Email | `buyer@jsek.com` |
+| Password | `Buyer123!` |
+
+This account is seeded automatically into `jsek_users` the first time `login.html` loads, so it works even without registering through `signup.html`.
+
+To test: go to `index.html` → **Login as Buyer**, sign in with the credentials above, add one or more saved items to the cart on `buyer_dashboard.html`, adjust quantities or remove items as needed, then select **Proceed to Checkout**. The checkout page shows the cart items and their combined subtotal, and you can pay using any of the [card testing numbers](#checkout-card-testing) above.
+
 
 ## Run Locally
 
@@ -61,6 +77,7 @@ The demo stores accounts and the active session in browser `localStorage` using 
 | `index.html` | Marketplace portal selection |
 | `signup.html` | Create a demo account and choose a role |
 | `login.html` | Sign in and route to the appropriate area |
+| `buyer_dashboard.html` | Saved items, cart management, and checkout hand-off |
 | `checkout.html` | Demonstration checkout flow |
 | `receipt.html` | Payment receipt with HST calculation and delivery options |
 | `vendor_inventory.html` | Vendor stock overview |
